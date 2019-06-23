@@ -8,20 +8,33 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
 
+    #vendor services
+    GuzzleHttp\Client:
+
+    #custom services
+    CbrRatesBundle\Service\CbrService:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    #Command
+    CbrRatesBundle\Command\GetCurrenciesRatesCommand:
+        tags:
+            - { name: 'console.command', command: 'currency:get-rates' }
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+#    CbrRatesBundle\:
+#        resource: '../src/CbrRatesBundle/*'
+#        exclude: '../src/CbrRatesBundle/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+#    CbrRatesBundle\Controller\:
+#        resource: '../src/CbrRatesBundle/Controller'
+#        tags: ['controller.service_arguments']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -1,0 +1,8 @@
+parameters:
+    ide: phpstorm
+    database_driver: pdo_pgsql
+    database_host: cbr_rates-db
+    database_port: 5432
+    database_name: cbr_rates
+    database_user: cbr_rates
+    database_password: 'Hv~U*8955dd@dd'
