@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RatesController extends AbstractController
 {
     /**
-     * @Route("/rates", name="rates")
+     * @Route("/rates", name="rates-list")
      */
     public function index()
     {
