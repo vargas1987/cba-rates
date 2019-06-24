@@ -1,14 +1,3 @@
-index:
-    path: /rates
-    controller: CbrRatesBundle\Controller\RatesController::index
-
-#index:
-#    host:     "{domain}"
-#    resource: "@ShiptorRussiaBundle/Controller"
-#    prefix:   /rates
-#    type:     annotation
-#    defaults:
-#        domain: "%main_domain%"
-#    requirements:
-#        domain: "%main_domain%"
-#    schemes:  ["%protocol%"]
+#controllers:
+#  resource: '../src/CbrRatesBundle/Controller/'
+#  type:     annotation
