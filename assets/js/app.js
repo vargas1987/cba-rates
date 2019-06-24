@@ -1,9 +1,11 @@
 import '../css/app.css';
+import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 
+import 'bootstrap';
 import $ from 'jquery';
 $(function () {
     $.ajax({
-        url: "http://cbr-rates.local/rates",
+        url: "http://cbr-rates.local",
         context: document.body
     }).done(function() {
         console.log('Hello Webpack Encore');

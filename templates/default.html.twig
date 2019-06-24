@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ controller_name }}!{% endblock %}
+
+{% block body %}
+<body>
+    <div class="container-fluid">
+        <div class="content-page">
+            <div class="row">
+                <div class="col-lg-12">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
