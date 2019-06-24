@@ -3,7 +3,11 @@
 {% block content %}
 
 <div class="col-lg-12">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-    <h1>Number of currencies {{ count }}! ✅</h1>
+    {% for item in pager %}
+        <tr>
+            <td class="text-center">{{ item.nominal }}</td>
+            <td class="text-center">{{ item.value }}</td>
+        </tr>
+    {% endfor %}
 </div>
 {% endblock %}

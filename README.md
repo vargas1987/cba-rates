@@ -7,3 +7,4 @@
 * __composer install__
 * __yarn install__
 * __yarn encore dev__
+* __php bin/console doctrine:migrations:migrate__
