@@ -11,6 +11,16 @@ use CbrRatesBundle\Entity\BillingCurrency;
 class BillingCurrencyRateRepository extends EntityRepository
 {
     /**
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getRatesQb()
+    {
+        return $this->createQueryBuilder('bcr')
+            ->orderBy('bcr.id', 'DESC')
+        ;
+    }
+
+    /**
      * @param BillingCurrency|string $currencyFrom
      * @param BillingCurrency|string $currencyTo
      * @param \DateTime              $date

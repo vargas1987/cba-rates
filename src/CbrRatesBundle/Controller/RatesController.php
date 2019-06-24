@@ -10,27 +10,27 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RatesController extends AbstractController
 {
     /**
-     * @Route("/", name="rates-list")
+     * @Route("/{page}", name="rates-list", defaults={"page" = 1}, requirements={"page" = "\d+"})
+     * @param Request $request
+     * @return Response
      */
-    public function index()
+    public function index(Request $request, $page)
     {
         $qb = $this->getEm()->getRepository('CbrRatesBundle:BillingCurrencyRate')
-            ->createQueryBuilder('bcr')
-//            ->andWhere('bcr.currencyFrom = :currencyFrom')
-//            ->andWhere('bcr.currencyTo = :currencyTo')
-//            ->setParameter('currencyFrom', 'RUB')
-//            ->setParameter('currencyTo', 'USD')
-            ->addOrderBy('bcr.id')
+            ->getRatesQb()
         ;
+
         try {
             /** @var Pagerfanta|BillingCurrencyRate[] $pager */
             $pager = $this->get(PagerService::class)->getPagerByQueryBuilder($qb, [
-                PagerService::OPT_PAGE => 1,
+                PagerService::OPT_PAGE => $page,
                 PagerService::OPT_PER_PAGE => 50,
                 PagerService::OPT_PER_PAGE_LIMIT => 50,
             ]);
