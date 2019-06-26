@@ -1,11 +1,11 @@
 <?php
-namespace CbrRatesBundle\Entity;
+namespace CbrRates\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="billing.currency_rate")
- * @ORM\Entity(repositoryClass="CbrRatesBundle\Repository\BillingCurrencyRateRepository")
+ * @ORM\Entity(repositoryClass="CbrRates\Repository\BillingCurrencyRateRepository")
  */
 class BillingCurrencyRate
 {
@@ -26,7 +26,7 @@ class BillingCurrencyRate
     /**
      * @var BillingCurrency
      *
-     * @ORM\ManyToOne(targetEntity="\CbrRatesBundle\Entity\BillingCurrency")
+     * @ORM\ManyToOne(targetEntity="\CbrRates\Entity\BillingCurrency")
      * @ORM\JoinColumn(name="currency_from", referencedColumnName="char_code")
      */
     private $currencyFrom;
@@ -34,7 +34,7 @@ class BillingCurrencyRate
     /**
      * @var BillingCurrency
      *
-     * @ORM\ManyToOne(targetEntity="\CbrRatesBundle\Entity\BillingCurrency")
+     * @ORM\ManyToOne(targetEntity="\CbrRates\Entity\BillingCurrency")
      * @ORM\JoinColumn(name="currency_to", referencedColumnName="char_code")
      */
     private $currencyTo;

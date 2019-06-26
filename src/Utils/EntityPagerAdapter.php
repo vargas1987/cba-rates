@@ -1,6 +1,6 @@
 <?php
 
-namespace CbrRatesBundle\Utils;
+namespace CbrRates\Utils;
 
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
@@ -13,7 +13,7 @@ use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Pagerfanta\Adapter\AdapterInterface;
-use CbrRatesBundle\Exception\InvalidPagerDataException;
+use CbrRates\Exception\InvalidPagerDataException;
 
 /**
  * Class EntityPagerAdapter

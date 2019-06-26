@@ -1,5 +1,5 @@
 <?php
-namespace CbrRatesBundle\Service;
+namespace CbrRates\Service;
 
 use GuzzleHttp\Client;
 

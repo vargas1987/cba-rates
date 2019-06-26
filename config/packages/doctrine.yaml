@@ -18,9 +18,9 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
         mappings:
-            CbrRatesBundle:
+            CbrRates:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/CbrRatesBundle/Entity'
-                prefix: 'CbrRatesBundle\Entity'
-                alias: 'CbrRatesBundle'
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'CbrRates\Entity'
+                alias: 'CbrRates'

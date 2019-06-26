@@ -1,5 +1,5 @@
 <?php
-namespace CbrRatesBundle\Repository;
+namespace CbrRates\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

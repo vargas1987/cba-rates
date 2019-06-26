@@ -1,6 +1,6 @@
 <?php
 
-namespace CbrRatesBundle\Service;
+namespace CbrRates\Service;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -11,9 +11,9 @@ use Pagerfanta\Adapter\NullAdapter;
 use Pagerfanta\Exception\NotIntegerMaxPerPageException;
 use Pagerfanta\Exception\NotValidCurrentPageException;
 use Pagerfanta\Pagerfanta;
-use CbrRatesBundle\Exception\InvalidPagerDataException;
-use CbrRatesBundle\Exception\NotValidCurrentPagePagerException;
-use CbrRatesBundle\Utils\EntityPagerAdapter;
+use CbrRates\Exception\InvalidPagerDataException;
+use CbrRates\Exception\NotValidCurrentPagePagerException;
+use CbrRates\Utils\EntityPagerAdapter;
 
 /**
  * Class PagerService

@@ -1,9 +1,9 @@
 <?php
-namespace CbrRatesBundle\Repository;
+namespace CbrRates\Repository;
 
-use CbrRatesBundle\Entity\BillingCurrencyRate;
+use CbrRates\Entity\BillingCurrencyRate;
 use Doctrine\ORM\EntityRepository;
-use CbrRatesBundle\Entity\BillingCurrency;
+use CbrRates\Entity\BillingCurrency;
 
 /**
  * Class BillingCurrencyRateRepository

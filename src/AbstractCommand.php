@@ -1,6 +1,6 @@
 <?php
 
-namespace CbrRatesBundle;
+namespace CbrRates;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;

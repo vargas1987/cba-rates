@@ -15,15 +15,15 @@ services:
     GuzzleHttp\Client:
 
     #custom services
-    CbrRatesBundle\Service\CbrService:
+    CbrRates\Service\CbrService:
         autowire: true
         autoconfigure: true
         public: true
-    CbrRatesBundle\Service\PagerService:
+    CbrRates\Service\PagerService:
         autowire: true
         autoconfigure: true
         public: true
     #Command
-    CbrRatesBundle\Command\GetCurrenciesRatesCommand:
+    CbrRates\Command\GetCurrenciesRatesCommand:
         tags:
             - { name: 'console.command', command: 'currency:get-rates' }

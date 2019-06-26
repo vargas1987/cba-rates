@@ -1,11 +1,10 @@
 <?php
 
-namespace CbrRatesBundle\Controller;
+namespace CbrRates\Controller;
 
-use CbrRatesBundle\Entity\BillingCurrency;
-use CbrRatesBundle\Entity\BillingCurrencyRate;
-use CbrRatesBundle\Exception\BasicException;
-use CbrRatesBundle\Service\PagerService;
+use CbrRates\Entity\BillingCurrencyRate;
+use CbrRates\Exception\BasicException;
+use CbrRates\Service\PagerService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta;
@@ -23,7 +22,7 @@ class RatesController extends AbstractController
      */
     public function index(Request $request, $page)
     {
-        $qb = $this->getEm()->getRepository('CbrRatesBundle:BillingCurrencyRate')
+        $qb = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate')
             ->getRatesQb()
         ;
 

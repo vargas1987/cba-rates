@@ -1,11 +1,11 @@
 <?php
-namespace CbrRatesBundle\Entity;
+namespace CbrRates\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="billing.currency")
- * @ORM\Entity(repositoryClass="CbrRatesBundle\Repository\BillingCurrencyRepository")
+ * @ORM\Entity(repositoryClass="CbrRates\Repository\BillingCurrencyRepository")
  */
 class BillingCurrency
 {

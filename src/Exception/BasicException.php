@@ -1,6 +1,6 @@
 <?php
 
-namespace CbrRatesBundle\Exception;
+namespace CbrRates\Exception;
 
 /**
  * Class BasicException

@@ -1,11 +1,11 @@
 <?php
 
-namespace CbrRatesBundle\Command;
+namespace CbrRates\Command;
 
-use CbrRatesBundle\AbstractCommand;
-use CbrRatesBundle\Entity\BillingCurrency;
-use CbrRatesBundle\Entity\BillingCurrencyRate;
-use CbrRatesBundle\Service\CbrService;
+use CbrRates\AbstractCommand;
+use CbrRates\Entity\BillingCurrency;
+use CbrRates\Entity\BillingCurrencyRate;
+use CbrRates\Service\CbrService;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class GetCurrenciesRatesCommand
- * @package CbrRatesBundle\Command
+ * @package CbrRates\Command
  */
 class GetCurrenciesRatesCommand extends AbstractCommand
 {
@@ -63,7 +63,7 @@ class GetCurrenciesRatesCommand extends AbstractCommand
         $currencies = $this->get(CbrService::class)->getCurrencies();
         $rates      = $this->get(CbrService::class)->getRates($date);
 
-        $homeCurrency = $this->getEm()->getRepository('CbrRatesBundle:BillingCurrency')->findOneBy([
+        $homeCurrency = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findOneBy([
             'charCode' => BillingCurrency::CODE_RUB,
         ]);
 
@@ -81,12 +81,12 @@ class GetCurrenciesRatesCommand extends AbstractCommand
             $output->writeln('Currency RUB added.');
         }
 
-        $currencyRateRepo = $this->getEm()->getRepository('CbrRatesBundle:BillingCurrencyRate');
+        $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
 
         foreach ($rates as $rate) {
             $charCode = $rate['CharCode'];
 
-            $currency = $this->getEm()->getRepository('CbrRatesBundle:BillingCurrency')->findOneBy([
+            $currency = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findOneBy([
                 'charCode' => $charCode,
             ]);
 
