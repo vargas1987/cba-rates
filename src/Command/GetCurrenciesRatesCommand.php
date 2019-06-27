@@ -5,7 +5,7 @@ namespace CbrRates\Command;
 use CbrRates\AbstractCommand;
 use CbrRates\Entity\BillingCurrency;
 use CbrRates\Entity\BillingCurrencyRate;
-use CbrRates\Service\CbrService;
+use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -56,12 +56,24 @@ class GetCurrenciesRatesCommand extends AbstractCommand
         if (!$date) {
             $output->writeln('Wrong date format.');
             $output->writeln('END');
+
+            return;
         }
 
         $output->writeln('Date: '.$date->format('Y-m-d'));
 
-        $currencies = $this->get(CbrService::class)->getCurrencies();
-        $rates      = $this->get(CbrService::class)->getRates($date);
+        try {
+            $currencies = $this->getCbrService()->getCurrencies();
+            $rates      = $this->getCbrService()->getRates($date);
+        } catch (ClientException $exception) {
+            $this->getLogger()->error('Client does not available', ['exception' => $exception]);
+        } catch (\Exception $exception) {
+            $output->writeln('An unexpected error has been occurred.');
+            $output->writeln('END');
+            $this->getLogger()->error($exception->getMessage(), ['exception' => $exception]);
+
+            return;
+        }
 
         $homeCurrency = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findOneBy([
             'charCode' => BillingCurrency::CODE_RUB,
@@ -83,7 +95,8 @@ class GetCurrenciesRatesCommand extends AbstractCommand
 
         $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
 
-        foreach ($rates as $rate) {
+        $this->getTransactionService()->beginTransaction();
+        foreach ($rates as $iterator => $rate) {
             $charCode = $rate['CharCode'];
 
             $currency = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findOneBy([
@@ -91,7 +104,7 @@ class GetCurrenciesRatesCommand extends AbstractCommand
             ]);
 
             if (!$currency) {
-                $this->addCurrency($charCode, $currencies);
+                $currency = $this->addCurrency($charCode, $currencies);
                 $output->writeln('Currency '.$charCode.' added.');
             }
 
@@ -139,9 +152,29 @@ class GetCurrenciesRatesCommand extends AbstractCommand
             } else {
                 $output->writeln('Currency '.$charCode.' not detected.');
             }
+
+            if ($iterator%20 === 0) {
+                try {
+                    $this->getEm()->flush();
+                    $this->getTransactionService()->commit();
+                    $this->getTransactionService()->beginTransaction();
+                } catch (\Exception $exception) {
+                    $this->getTransactionService()->rollback();
+                    $output->writeln('An unexpected error has been occurred.');
+                    $output->writeln('CONTINUE...');
+                    $this->getLogger()->error($exception->getMessage(), ['exception' => $exception]);
+                }
+            }
         }
 
-        $this->getEm()->flush();
+        try {
+            $this->getEm()->flush();
+            $this->getTransactionService()->commit();
+        } catch (\Exception $exception) {
+            $this->getTransactionService()->rollback();
+            $output->writeln('An unexpected error has been occurred.');
+            $this->getLogger()->error($exception->getMessage(), ['exception' => $exception]);
+        }
         $output->writeln('END');
     }
 
@@ -163,22 +196,28 @@ class GetCurrenciesRatesCommand extends AbstractCommand
     /**
      * @param string $charCode
      * @param array  $currencies
+     * @return BillingCurrency|null
      */
-    private function addCurrency($charCode, $currencies)
+    private function addCurrency(string $charCode, array $currencies)
     {
         $currencyData = $this->getCurrencyData($charCode, $currencies);
 
-        if ($currencyData) {
-            $currency = new BillingCurrency();
-
-            $currency
-                ->setCharCode($currencyData['ISO_Char_Code'])
-                ->setNumCode($currencyData['ISO_Num_Code'])
-                ->setName($currencyData['Name'])
-            ;
-
-            $this->getEm()->persist($currency);
+        if (!$currencyData) {
+            return null;
         }
+
+        $currency = new BillingCurrency();
+
+        $currency
+            ->setCharCode($currencyData['ISO_Char_Code'])
+            ->setNumCode($currencyData['ISO_Num_Code'])
+            ->setName($currencyData['Name'])
+        ;
+
+        $this->getEm()->persist($currency);
+
+        return $currency;
+
     }
 
     /**

@@ -23,6 +23,10 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+    CbrRates\Service\TransactionService:
+        autowire: true
+        autoconfigure: true
+        public: true
     #Command
     CbrRates\Command\GetCurrenciesRatesCommand:
         tags:
