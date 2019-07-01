@@ -5,6 +5,7 @@ namespace CbrRates\Command;
 use CbrRates\AbstractCommand;
 use CbrRates\Entity\BillingCurrency;
 use CbrRates\Entity\BillingCurrencyRate;
+use CbrRates\Repository\BillingCurrencyRateRepository;
 use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -92,7 +93,7 @@ class GetCurrenciesRatesCommand extends AbstractCommand
 
             $output->writeln('Currency RUB added.');
         }
-
+        /** @var BillingCurrencyRateRepository $currencyRateRepo */
         $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
 
         $this->getTransactionService()->beginTransaction();

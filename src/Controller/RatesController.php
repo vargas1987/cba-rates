@@ -2,8 +2,11 @@
 
 namespace CbrRates\Controller;
 
+use CbrRates\Entity\BillingCurrency;
 use CbrRates\Entity\BillingCurrencyRate;
 use CbrRates\Exception\BasicException;
+use CbrRates\Form\CurrencyFilterForm;
+use CbrRates\Repository\BillingCurrencyRateRepository;
 use CbrRates\Service\PagerService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
@@ -22,9 +25,23 @@ class RatesController extends AbstractController
      */
     public function index(Request $request, $page)
     {
-        $qb = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate')
-            ->getRatesQb()
-        ;
+        $form = $this->createForm(CurrencyFilterForm::class);
+
+        $form->handleRequest($request);
+        /** @var BillingCurrencyRateRepository $currencyRateRepo */
+        $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
+        $qb = $currencyRateRepo->getRatesQb(['currencyTo' => BillingCurrency::CODE_RUB]);
+
+        if ($form->isSubmitted()&& $form->isValid()) {
+            $qb = $currencyRateRepo->getRatesQb([
+                'currencyFrom' => $form->get('currency')->getData(),
+                'currencyTo' => BillingCurrency::CODE_RUB,
+                'rateUpperDate' => $form->get('rateUpperDate')->getData(),
+                'rateLowerDate' => $form->get('rateLowerDate')->getData(),
+                'currencySort' => $form->get('currencySort')->getData(),
+                'dateSort' => $form->get('rateDateSort')->getData(),
+            ]);
+        }
 
         try {
             /** @var Pagerfanta|BillingCurrencyRate[] $pager */
@@ -38,8 +55,9 @@ class RatesController extends AbstractController
         }
 
         return $this->render('rates/index.html.twig', [
+            'form'   => $form->createView(),
             'controller_name' => 'RatesController',
-            'pager' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
         ]);
     }
 

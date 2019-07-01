@@ -11,13 +11,50 @@ use CbrRates\Entity\BillingCurrency;
 class BillingCurrencyRateRepository extends EntityRepository
 {
     /**
+     * @param array $params
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getRatesQb()
+    public function getRatesQb(array $params)
     {
-        return $this->createQueryBuilder('bcr')
-            ->orderBy('bcr.id', 'DESC')
+        $qb = $this
+            ->createQueryBuilder('bcr')
+            ->andWhere('bcr.date <= :rateUpperDate')
+            ->setParameter('rateUpperDate', $params['rateUpperDate'] ?? new \DateTime())
         ;
+
+        if (isset($params['currencyFrom'])) {
+            $qb
+                ->andWhere('bcr.currencyFrom = :currencyFrom')
+                ->setParameter('currencyFrom', $params['currencyFrom']);
+        }
+
+        if (isset($params['currencyTo'])) {
+            $qb
+                ->andWhere('bcr.currencyTo = :currencyTo')
+                ->setParameter('currencyTo', $params['currencyTo']);
+        }
+
+        if (isset($params['rateLowerDate'])) {
+            $qb
+                ->andWhere('bcr.date >= :rateLowerDate')
+                ->setParameter('rateLowerDate', $params['rateLowerDate']);
+        }
+
+        if (isset($params['currencySort'])) {
+            $qb
+                ->addOrderBy('bcr.currencyFrom', $params['currencySort']);
+        }
+
+        if (isset($params['dateSort'])) {
+            $qb
+                ->addOrderBy('bcr.date', $params['dateSort']);
+        }
+
+        $qb
+            ->addOrderBy('bcr.id')
+        ;
+
+        return $qb;
     }
 
     /**
@@ -29,16 +66,14 @@ class BillingCurrencyRateRepository extends EntityRepository
      */
     public function getRate($currencyFrom, $currencyTo, \DateTime $date = null)
     {
+        $params = [
+            'currencyFrom' => $currencyFrom,
+            'currencyTo' => $currencyTo,
+            'rateUpperDate' => $date,
+        ];
+
         /** @var BillingCurrencyRate $rate */
-        $rate = $this->createQueryBuilder('bcr')
-            ->andWhere('bcr.currencyFrom = :curFrom')
-            ->andWhere('bcr.currencyTo = :curTo')
-            ->andWhere('bcr.date <= :date')
-            ->setParameters([
-                'curFrom' => $currencyFrom,
-                'curTo' => $currencyTo,
-                'date' => $date ?: new \DateTime(),
-            ])
+        $rate = $this->getRatesQb($params)
             ->orderBy('bcr.date', 'DESC')
             ->setMaxResults(1)
             ->getQuery()

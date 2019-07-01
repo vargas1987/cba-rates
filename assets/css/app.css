@@ -1,3 +1,30 @@
-body {
-    background-color: #ffff00;
+.list-group-item-heading {
+    border-color: #23638c !important;
+    color: #fff;
+    background: #2175ac3d !important;
+    border-radius: 0;
+}
+
+.list-group.list-group-primary>.list-group-item-heading {
+    border-color: #23638c !important;
+    color: #fff;
+    background: #2175ac3d !important;
+    border-radius: 0;
+}
+
+.list-group .list-group-item.list-group-item-heading {
+    border-bottom-width: 1px;
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+.list-group-item-heading {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    border-radius: 0 !important;
+    height: 32px !important;
+    padding: 4px 12px !important;
 }

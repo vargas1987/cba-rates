@@ -1,13 +1,136 @@
 {% extends 'default.html.twig' %}
 
-{% block content %}
+{% block content -%}
+    <div id="rates-filter" class="table-primary" style="padding-bottom: 200px;">
+        {{ form_start(form, {'action': path('rates-list')}) }}
+        <div style="margin-bottom: 0; background: #cccccc00; padding-top: 30px;">
+            <div class="container">
+                <div class="row bold">
+                    <div class="col-md-4">{{ form_row(form.currency) }}</div>
+                    <div class="col-md-3">{{ form_row(form.rateLowerDate) }}</div>
+                    <div class="col-md-3">{{ form_row(form.rateUpperDate) }}</div>
+                    <div class="col-md-2 pull-right">
+                        <div class="form-group">
+                            <a id="submit" href="javascript:;" class="btn btn-md btn-default expand-inline">
+                                Поиск
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ul class="list-group list-group-primary">
+                <li class="list-group-item list-group-item-heading visible-md visible-lg">
+                    <div class="row">
+                        <div class="visible-md visible-lg col-md-1">#</div>
+                        <div class="col-md-3">
+                            <span class="sort">Валюта <i class="fa fa-sort"></i>
+                                {{ form_row(form.currencySort) }}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="sort">Курс</span>
+                        </div>
+                        <div class="col-md-5">
+                            <span class="sort">Дата курса <i class="fa fa-sort"></i>
+                                {{ form_row(form.rateDateSort) }}
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                {% for item in pager %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="visible-md visible-lg col-md-1">{{ loop.index }}</div>
+                            <div class="col-md-4">
+                                {{ item.currencyFrom.name }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ item.value }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ item.date|date("F jS \\a\\t g:ia") }}
+                            </div>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                Нет данных для отображения
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+//        $(function () {
+//            $('[data-behaviour=datepicker]').datepicker({
+//                weekStart: 1,
+//                format: 'yyyy-mm-dd',
+//                orientation: 'auto top',
+//                autoclose: true
+//            });
+            {#var lowerSort = $('#{{ form.dateLowerSort.vars.id }}');#}
+            {#var upperSort = $('#{{ form.dateUpperSort.vars.id }}');#}
+            {#var countSort = $('#{{ form.countSort.vars.id }}');#}
+            {#var perWeekSort = $('#{{ form.perWeekSort.vars.id }}');#}
 
-<div class="col-lg-12">
-    {% for item in pager %}
-        <tr>
-            <td class="text-center">{{ item.nominal }}</td>
-            <td class="text-center">{{ item.value }}</td>
-        </tr>
-    {% endfor %}
-</div>
+            {#function changeSort(input) {#}
+                {#var clickableElement = input.closest('span.sort');#}
+                {#var ord = input.val();#}
+                {#var icon = clickableElement.find('i');#}
+                {#icon.removeClass();#}
+                {#icon.addClass('fa').addClass('fa-sort' + (ord ? '-' + ord.toLowerCase() : ''));#}
+            {#}#}
+
+            {#function request() {#}
+                {#$.ajax({#}
+                    {#url: '{{ url('rates-list') }}',#}
+                    {#data: $('form').serialize(),#}
+                    {#method: 'POST',#}
+                    {#success: function (response) {#}
+                        {#$('ul.list-group li:not(:first)').remove();#}
+                        {#var list = $(response).find('ul.list-group li:not(:first)');#}
+                        {#list.each(function () {#}
+                            {#$('ul.list-group').append($(this));#}
+                        {#});#}
+                    {#}#}
+                {#});#}
+            {#}#}
+
+            {#$('#submit').on('click', request);#}
+            {#var initSortButton = function (input) {#}
+                {#changeSort(input);#}
+                {#var clickableElement = input.closest('span.sort');#}
+                {#clickableElement.on('click', function () {#}
+                    {#var fields = [#}
+                        {#lowerSort,#}
+                        {#upperSort,#}
+                        {#countSort,#}
+                        {#perWeekSort#}
+                    {#];#}
+                    {#var ord = input.val();#}
+                    {#fields.forEach(function (item) {#}
+                        {#$(item).val('');#}
+                        {#changeSort(item);#}
+                    {#});#}
+                    {#ord = ord ? (ord == 'ASC' ? 'DESC' : '') : 'ASC';#}
+                    {#input.val(ord);#}
+                    {#changeSort(input);#}
+                    {#request();#}
+                {#});#}
+            {#};#}
+
+            {#initSortButton(lowerSort);#}
+            {#initSortButton(upperSort);#}
+            {#initSortButton(countSort);#}
+            {#initSortButton(perWeekSort);#}
+//        });
+    </script>
 {% endblock %}

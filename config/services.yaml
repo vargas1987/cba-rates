@@ -11,6 +11,10 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Forms
+    CbrRates\Form\:
+        resource: '../src/Form'
+
     #vendor services
     GuzzleHttp\Client:
 
