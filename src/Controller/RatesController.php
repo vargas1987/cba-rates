@@ -47,8 +47,8 @@ class RatesController extends AbstractController
             /** @var Pagerfanta|BillingCurrencyRate[] $pager */
             $pager = $this->get(PagerService::class)->getPagerByQueryBuilder($qb, [
                 PagerService::OPT_PAGE => $page,
-                PagerService::OPT_PER_PAGE => 50,
-                PagerService::OPT_PER_PAGE_LIMIT => 50,
+                PagerService::OPT_PER_PAGE => 30,
+                PagerService::OPT_PER_PAGE_LIMIT => 30,
             ]);
         } catch (BasicException $exception) {
             return $this->redirectToRoute('backend-dashboard');

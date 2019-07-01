@@ -1,3 +1,11 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+    font-size: 13px !important;
+    line-height: 1.42857143 !important;
+    color: #333 !important;
+    background-color: #fff !important;
+}
+
 .list-group-item-heading {
     border-color: #23638c !important;
     color: #fff;
@@ -27,4 +35,83 @@
     border-radius: 0 !important;
     height: 32px !important;
     padding: 4px 12px !important;
+}
+
+/*RTL: Pagination*/
+/*--------------------------------------------------*/
+ul, menu, dir {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+.pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 24px 0;
+    border-radius: 3px;
+}
+
+.pagination>li {
+    display: inline;
+}
+
+.pagination>li>a, .pagination>li>span {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    color: #595959;
+    margin-right: 5px;
+    border-radius: 2px;
+    position: relative;
+    float: left;
+    padding: 8px 18px;
+    line-height: 1.5;
+    text-decoration: none;
+}
+
+.pagination>li:first-child>a, .pagination>li:first-child>span {
+    margin-left: 0;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+}
+
+.pagination>.disabled>span, .pagination>.disabled>span:hover, .pagination>.disabled>span:focus, .pagination>.disabled>a, .pagination>.disabled>a:hover, .pagination>.disabled>a:focus {
+    color: #777;
+    background-color: #fff;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+.pager .previous > a {
+    float: right;
+}
+
+.pager .next > a {
+    float: left;
+}
+
+.theme-default .pagination>li.active>a, .theme-default .pagination>li.active>a:hover, .theme-default .pagination>li.active>a:focus, .theme-default .pagination>li.active>span {
+    background: #1d89cf;
+    border-color: #1d89cf;
+}
+
+.pagination>li.active>a, .pagination>li.active>span {
+    color: #fff;
+    background: #1d89cf;
+    font-weight: 600;
+}
+
+.pagination>li>a:hover {
+    background-color: transparent;
+    color: #333;
+    border-color: #1d89cf;
 }
