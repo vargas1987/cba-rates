@@ -30,18 +30,24 @@ class RatesController extends AbstractController
         $form->handleRequest($request);
         /** @var BillingCurrencyRateRepository $currencyRateRepo */
         $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
-        $qb = $currencyRateRepo->getRatesQb(['currencyTo' => BillingCurrency::CODE_RUB]);
+        $params = [
+            'currencyTo' => BillingCurrency::CODE_RUB,
+            'rateUpperDate' => new \DateTime(),
+            'currencyFrom' => $form->get('currency')->getData(),
+        ];
 
         if ($form->isSubmitted()&& $form->isValid()) {
-            $qb = $currencyRateRepo->getRatesQb([
+            $params = [
                 'currencyFrom' => $form->get('currency')->getData(),
                 'currencyTo' => BillingCurrency::CODE_RUB,
                 'rateUpperDate' => $form->get('rateUpperDate')->getData(),
                 'rateLowerDate' => $form->get('rateLowerDate')->getData(),
                 'currencySort' => $form->get('currencySort')->getData(),
                 'dateSort' => $form->get('rateDateSort')->getData(),
-            ]);
+            ];
         }
+
+        $qb = $currencyRateRepo->getRatesQb($params);
 
         try {
             /** @var Pagerfanta|BillingCurrencyRate[] $pager */

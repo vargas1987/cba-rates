@@ -18,9 +18,13 @@ class BillingCurrencyRateRepository extends EntityRepository
     {
         $qb = $this
             ->createQueryBuilder('bcr')
-            ->andWhere('bcr.date <= :rateUpperDate')
-            ->setParameter('rateUpperDate', $params['rateUpperDate'] ?? new \DateTime())
         ;
+
+        if (isset($params['rateUpperDate'])) {
+            $qb
+                ->andWhere('bcr.date <= :rateUpperDate')
+                ->setParameter('rateUpperDate', $params['rateUpperDate']);
+        }
 
         if (isset($params['currencyFrom'])) {
             $qb
@@ -69,15 +73,15 @@ class BillingCurrencyRateRepository extends EntityRepository
         $params = [
             'currencyFrom' => $currencyFrom,
             'currencyTo' => $currencyTo,
-            'rateUpperDate' => $date,
         ];
 
         /** @var BillingCurrencyRate $rate */
         $rate = $this->getRatesQb($params)
+            ->andWhere('bcr.date = :rateUpperDate')
+            ->setParameter('rateUpperDate', $date)
             ->orderBy('bcr.date', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
-            ->useResultCache(true, 3600)
             ->getOneOrNullResult();
 
         return $rate ? $rate->getNormalizedValue() : null;
