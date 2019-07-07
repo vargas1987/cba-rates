@@ -74,4 +74,143 @@
             }}
         </nav>
     {% endif %}
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="chart-ff" style="height: 400px">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var chartFulfilment = AmCharts.makeChart("chart-ff",
+            {
+                "type": "serial",
+                "dataDateFormat": "YYYY-MM-DD",
+                "pathToImages": "{{ asset("img") }}/amcharts/",
+                "startDuration": 0,
+                "theme": "default",
+                "categoryAxis": {
+                    "parseDates": true,
+                    "gridPosition": "start",
+                    "minPeriod": "DD",
+                    "gridAlpha": 0,
+                    "dateFormats": [
+                        {period: 'DD', format: 'DD.MM'},
+                        {period: 'MM', format: 'DD.MM.YYYY'},
+                        {period: 'YYYY', format: 'MM.YYYY'}
+                    ]
+                },
+                "graphs": [
+                    {
+                        "balloonText": "[[title]] [[category]]: [[value]]",
+                        "fillAlphas": 1,
+                        "lineColor": "#fc7502",
+                        "id": "productTotal",
+                        "title": "За сборку",
+                        "type": "column",
+                        "valueField": "productTotal"
+                    },
+                    {
+                        "balloonText": "[[title]] [[category]]: [[value]]",
+                        "fillAlphas": 1,
+                        "lineColor": "#0d8ecf",
+                        "id": "packTotal",
+                        "title": "За упаковку",
+                        "type": "column",
+                        "valueField": "packTotal"
+                    },
+                    {
+                        "balloonText": "[[title]] [[category]]: [[value]]",
+                        "fillAlphas": 1,
+                        "lineColor": "#05cf5e",
+                        "id": "shipmentTotal",
+                        "title": "За приёмку",
+                        "type": "column",
+                        "valueField": "shipmentTotal"
+                    }
+                ],
+                "guides": [],
+                "valueAxes": [
+                    {
+                        "id": "cost",
+                        "stackType": "regular",
+                        "title": "Заработано  (рублей)",
+                        "minVerticalGap": 10,
+                        "precision": 0,
+                        "labelFrequency": 10
+                    }
+                ],
+                "allLabels": [],
+                "balloon": {},
+                "legend": {
+                    "enabled": true,
+                    "useGraphSettings": true,
+                    "position": "bottom"
+                },
+                "chartCursor": {
+                    "categoryBalloonDateFormat": "DD.MM.YYYY",
+                    "valueBalloonsEnabled": true
+                },
+                "categoryField": "date",
+                "dataProvider": []
+            }
+        );
+
+        chartFulfilment.dataProvider = [
+            {
+                "date": "2016-08-22",
+                "packTotal": "0",
+                "productTotal": 70,
+                "shipmentTotal": 0
+            },
+            {
+                "date": "2016-08-23",
+                "packTotal": "0",
+                "productTotal": 60,
+                "shipmentTotal": 126
+            },
+            {
+                "date": "2016-08-24",
+                "packTotal": "0",
+                "productTotal": 570,
+                "shipmentTotal": 1410
+            },
+            {
+                "date": "2016-08-25",
+                "packTotal": "0",
+                "productTotal": 740,
+                "shipmentTotal": 202
+            },
+            {
+                "date": "2016-08-26",
+                "packTotal": "0",
+                "productTotal": 610,
+                "shipmentTotal": 166
+            },
+            {
+                "date": "2016-08-29",
+                "packTotal": "0",
+                "productTotal": 410,
+                "shipmentTotal": 144
+            },
+            {
+                "date": "2016-08-30",
+                "packTotal": "0",
+                "productTotal": 160,
+                "shipmentTotal": 126
+            },
+            {
+                "date": "2016-08-31",
+                "packTotal": "0",
+                "productTotal": 960,
+                "shipmentTotal": 60
+            }
+        ];
+        chartFulfilment.validateData();
+
+    </script>
 {% endblock %}

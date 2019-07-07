@@ -55,6 +55,10 @@ Encore
         {
             from: './assets/images',
             to: './img'
+        },
+        {
+            from: './node_modules/amstock3/amcharts/images/',
+            to: './img/amcharts'
         }
     ]))
 ;
