@@ -3,11 +3,15 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 import '../../node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.css';
 import '../../node_modules/flag-icon-css/css/flag-icon.css';
 import '../../node_modules/font-awesome/css/font-awesome.css';
+import '../../node_modules/amstock3/amcharts/style.css';
 
 import 'bootstrap';
 import 'bootstrap-datepicker';
 import $ from 'jquery';
-import 'amstock3';
+import '../../node_modules/amstock3/amcharts/amcharts.js';
+import '../../node_modules/amstock3/amcharts/themes/light.js';
+import '../../node_modules/amstock3/amcharts/serial.js';
+import '../../node_modules/amstock3/amcharts/amstock.js';
 import './landkit';
 
 $(function () {
