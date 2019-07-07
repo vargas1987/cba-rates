@@ -7,6 +7,7 @@ import '../../node_modules/font-awesome/css/font-awesome.css';
 import 'bootstrap';
 import 'bootstrap-datepicker';
 import $ from 'jquery';
+import 'amstock3';
 import './landkit';
 
 $(function () {

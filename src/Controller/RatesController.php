@@ -5,8 +5,10 @@ namespace CbrRates\Controller;
 use CbrRates\Entity\BillingCurrency;
 use CbrRates\Entity\BillingCurrencyRate;
 use CbrRates\Exception\BasicException;
+use CbrRates\Form\ChartForm;
 use CbrRates\Form\CurrencyFilterForm;
 use CbrRates\Repository\BillingCurrencyRateRepository;
+use CbrRates\Repository\BillingCurrencyRepository;
 use CbrRates\Service\PagerService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
@@ -64,6 +66,25 @@ class RatesController extends AbstractController
             'form'   => $form->createView(),
             'controller_name' => 'RatesController',
             'pager' => $pager,
+        ]);
+    }
+
+    /**
+     * @Route("/statistics", name="rates-statistics")
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function statisticsAction(Request $request)
+    {
+        /** @var BillingCurrency[] $currencies */
+        $currencies = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findAll();
+        $form = $this->createForm(ChartForm::class);
+
+        return $this->render('rates/statistics.html.twig', [
+            'form'   => $form->createView(),
+            'controller_name' => 'RatesController',
+            'currencies' => $currencies,
         ]);
     }
 

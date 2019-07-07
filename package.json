@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@symfony/webpack-encore": "^0.27.0",
+    "amstock3": "^3.21.15",
     "bootstrap": "^4.3.1",
     "bootstrap-datepicker": "^1.9.0",
     "copy-webpack-plugin": "^5.0.3",

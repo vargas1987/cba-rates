@@ -1,0 +1,200 @@
+{% extends 'default.html.twig' %}
+
+{% block content %}
+    <div id="rates-filter" class="table-primary">
+        {{ form_start(form, {'action': path('rates-list')}) }}
+        <div style="margin-bottom: 0; background: #cccccc00; padding-top: 30px;">
+            <div class="container">
+                <div class="row bold">
+                    <div class="col-md-4">{{ form_row(form.lowerDate) }}</div>
+                    <div class="col-md-3">{{ form_row(form.upperDate) }}</div>
+                    <div class="col-md-3">{{ form_row(form.currency) }}</div>
+                    <div class="col-md-2 pull-right">
+                        <div class="form-group">
+                            <a id="submit" href="javascript:;" class="btn btn-md btn-default expand-inline">
+                                Поиск
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+
+        var colors = [];
+
+        function setProjectColors(data) {
+            var $html = $('<div />', {html: data});
+            $html.find('i[data-project]').each(function (index, item) {
+                var $item = $(item);
+                var id = $item.data('project');
+                var result = colors.filter(function (obj) {
+                    return obj.project == id;
+                });
+                if (result[0]) {
+                    $(item).css('color', result[0].color);
+                }
+            });
+            return $html;
+        }
+
+        $(function () {
+            function shuffle(array) {
+                var currentIndex = array.length, temporaryValue, randomIndex ;
+                while (0 !== currentIndex) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+                    temporaryValue = array[currentIndex];
+                    array[currentIndex] = array[randomIndex];
+                    array[randomIndex] = temporaryValue;
+                }
+                return array;
+            }
+
+            var generateColor = function (project) {
+                var colorSrc = [];
+                colorSrc.push((256 + Math.random() * 256).toString(16).substr(1, 2));
+                colorSrc.push("4a");
+                colorSrc.push("e0");
+                var colorHex = shuffle(colorSrc).join('');
+                var color = '#' + colorHex;
+                colors.push({project: project, color: color});
+                return color;
+            };
+
+            $('[data-behaviour=selectize]').selectize({
+                valueField: 'id',
+                labelField: 'value',
+                searchField: 'text',
+                sortField: 'text',
+                maxItems: 1,
+                options: []
+            }).each(function () {
+                var $this = $(this);
+                $($this[0].selectize.$control).after('<span class="clear-btn"><i class="fa fa-close"></i></span>');
+                $this[0].selectize.$wrapper.find('.clear-btn').on('click', function (event) {
+                    $this[0].selectize.setValue('');
+                });
+            });
+
+            $('[data-behaviour=datepicker]').datepicker({
+                viewMode: "months",
+                minViewMode: "months",
+                format: 'yyyy-mm',
+                orientation: 'auto top',
+                autoclose: true
+            }).each(function () {
+                var $this = $(this);
+                $this.after('<span class="clear-btn"><i class="fa fa-close"></i></span>');
+                $this.closest('div').find('.clear-btn').on('click', function (event) {
+                    $(this).closest('.form-group').find('input').val('');
+                });
+            });
+
+            var chart = AmCharts.makeChart("chart",
+                {
+                    "type": "serial",
+                    "dataDateFormat": "YYYY-MM-DD",
+                    "pathToImages": "{{ asset("img") }}/amstock/",
+                    "startDuration": 0,
+                    "theme": "default",
+                    "categoryAxis": {
+                        "labelRotation": 45,
+                        "parseDates": false,
+                        "gridPosition": "start",
+                        "minPeriod": "DD",
+                        "gridAlpha": 0
+                    },
+                    "dataSets": [{
+                        "compared": false
+                    }],
+                    "graphs": [
+                        {% for project in projects %}
+                        {   "balloonText": "[[title]]: [[value]]",
+                            "fillAlphas": 1,
+                            "lineColor": generateColor({{ project.id }}),
+                            "id": "{{ project.id }}",
+                            "title": "{{ project.articleWithDomain }}",
+                            "type": "column",
+                            "valueField": "{{ project.id }}"
+                        }{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    "guides": [],
+                    "valueAxes": [
+                        {
+                            "id": "package-count",
+                            "stackType": "regular",
+                            "title": "Посылки, шт.",
+                            "minVerticalGap": 10,
+                            "precision": 0,
+                            "labelFrequency": 10
+                        }
+                    ],
+                    "allLabels": [],
+                    "balloon": {},
+                    "legend": {
+                        "enabled": false
+                    },
+                    "chartCursor": {
+                        "valueBalloonsEnabled": false
+                    },
+                    "categoryField": "date",
+                    "dataProvider": []
+                }
+            );
+
+
+            var projectPackagesTableQuery = function (event) {
+                $.ajax({
+                    data: {
+                        lowerDate: $('#{{ form.lowerDate.vars.id }}').val(),
+                        upperDate: event.item.dataContext.date,
+                        manager: $('#{{ form.manager.vars.id }}').val()
+                    },
+                    method: "POST",
+                    url: "{{ url('backend-statistic-manager-package-table') }}",
+                    success: function (data) {
+                        $('.project-table').html(setProjectColors(data));
+                    }
+                });
+            };
+
+            chart.addListener("clickGraphItem", function (event) {
+                projectPackagesTableQuery(event);
+            });
+
+            $('[name={{ form.vars.name }}]').on('submit', function (event) {
+                event.preventDefault();
+                $.ajax({
+                    data: $('[name={{ form.vars.name }}]').serialize(),
+                    method: "POST",
+                    url: "{{ url('backend-statistic-manager-package-chart') }}",
+                    success: function (data) {
+                        chart.dataProvider = $.parseJSON(data);
+                        chart.validateData();
+                    }
+                });
+            }).submit();
+
+            $('[data-period]').on('click', function () {
+                var $this = $(this);
+                var period = $this.attr('data-period');
+                var upperDate = new Date();
+                var lowerDate = new Date();
+                lowerDate.setMonth(upperDate.getMonth() - parseInt(period));
+                $("#{{ form.upperDate.vars.id }}").datepicker('setDate', upperDate);
+                $("#{{ form.lowerDate.vars.id }}").datepicker('setDate', lowerDate);
+                $('[name={{ form.vars.name }}]').submit();
+            });
+        });
+    </script>
+{% endblock %}
+
