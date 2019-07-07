@@ -14,6 +14,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use function Symfony\Component\DependencyInjection\Tests\Fixtures\factoryFunction;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -62,10 +65,20 @@ class RatesController extends AbstractController
             return $this->redirectToRoute('backend-dashboard');
         }
 
+        $dataProvider = $this->prepareDataprovider([
+            'rateUpperDate' => $form->get('rateUpperDate')->getData(),
+            'rateLowerDate' => $form->get('rateLowerDate')->getData(),
+            'currencyTo' => BillingCurrency::CODE_RUB,
+        ]);
+
+        $graphs = $this->prepareGraphs($dataProvider);
+
         return $this->render('rates/index.html.twig', [
             'form'   => $form->createView(),
             'controller_name' => 'RatesController',
             'pager' => $pager,
+            'graphs' => $graphs,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -77,15 +90,80 @@ class RatesController extends AbstractController
      */
     public function statisticsAction(Request $request)
     {
-        /** @var BillingCurrency[] $currencies */
-        $currencies = $this->getEm()->getRepository('CbrRates:BillingCurrency')->findAll();
-        $form = $this->createForm(ChartForm::class);
+        if ($request->isXmlHttpRequest()) {
+            $form = $this->createForm(CurrencyFilterForm::class);
+            $params = $request->request->get($form->getName());
+            $dataProvider = $this->prepareDataprovider([
+                'rateUpperDate' => $params['rateUpperDate'] ?: null,
+                'rateLowerDate' => $params['rateLowerDate'] ?: null,
+                'currencyTo' => BillingCurrency::CODE_RUB,
+            ]);
 
-        return $this->render('rates/statistics.html.twig', [
-            'form'   => $form->createView(),
-            'controller_name' => 'RatesController',
-            'currencies' => $currencies,
-        ]);
+            $graphs = $this->prepareGraphs($dataProvider);
+
+            return new JsonResponse([
+                'graphs' => $graphs,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return new JsonResponse([]);
+    }
+
+    /**
+     * @param array $dataProvider
+     * @return array
+     */
+    protected function prepareGraphs(array $dataProvider) :array
+    {
+        $usedCurrencies = [];
+
+        foreach ($dataProvider as $data) {
+            $usedCurrencies = array_merge($usedCurrencies, array_keys($data));
+        }
+
+        $usedCurrencies = array_unique($usedCurrencies);
+
+        $graphs = $this->getEm()
+            ->getRepository('CbrRates:BillingCurrency')
+            ->findBy([], ['charCode' => 'ASC']);
+
+        $graphs = array_reduce($graphs, function ($result, BillingCurrency $currency) {
+            $result[$currency->getCharCode()] = [
+                'charCode' => $currency->getCharCode(),
+                'numCode' => $currency->getNumCode(),
+                'name' => $currency->getName(),
+            ];
+
+            return $result;
+        }, []);
+
+        return array_filter($graphs, function ($graph) use ($usedCurrencies) {
+            return \in_array($graph['charCode'], $usedCurrencies);
+        });
+    }
+
+    /**
+     * @param array $params
+     * @return array|null
+     */
+    protected function prepareDataprovider(array $params) :?array
+    {
+        /** @var BillingCurrencyRateRepository $currencyRateRepo */
+        $currencyRateRepo = $this->getEm()->getRepository('CbrRates:BillingCurrencyRate');
+        $dataProvider = $currencyRateRepo
+            ->getGraphData($params);
+
+        return array_reduce($dataProvider, function ($result, $data) {
+            $currencies = json_decode($data['currencies'], true);
+
+            $valeus = json_decode($data['values'], true);
+            $currencies = array_combine($currencies, $valeus);
+
+            $result[$data['date']->format('Y-m-d')] = $currencies;
+
+            return $result;
+        }, []);
     }
 
     /**

@@ -77,7 +77,7 @@
     <hr>
     <div class="row">
         <div class="col-md-12">
-            <div id="chart-ff" style="height: 400px">
+            <div id="chart-ff" style="height: 800px">
             </div>
         </div>
     </div>
@@ -91,57 +91,25 @@
                 "type": "serial",
                 "dataDateFormat": "YYYY-MM-DD",
                 "pathToImages": "{{ asset("img") }}/amcharts/",
-                "startDuration": 0,
+                "startDuration": 3,
                 "theme": "default",
                 "categoryAxis": {
                     "parseDates": true,
                     "gridPosition": "start",
                     "minPeriod": "DD",
-                    "gridAlpha": 0,
+                    "gridAlpha": 2,
                     "dateFormats": [
                         {period: 'DD', format: 'DD.MM'},
                         {period: 'MM', format: 'DD.MM.YYYY'},
                         {period: 'YYYY', format: 'MM.YYYY'}
                     ]
                 },
-                "graphs": [
-                    {
-                        "balloonText": "[[title]] [[category]]: [[value]]",
-                        "fillAlphas": 1,
-                        "lineColor": "#fc7502",
-                        "id": "productTotal",
-                        "title": "За сборку",
-                        "type": "column",
-                        "valueField": "productTotal"
-                    },
-                    {
-                        "balloonText": "[[title]] [[category]]: [[value]]",
-                        "fillAlphas": 1,
-                        "lineColor": "#0d8ecf",
-                        "id": "packTotal",
-                        "title": "За упаковку",
-                        "type": "column",
-                        "valueField": "packTotal"
-                    },
-                    {
-                        "balloonText": "[[title]] [[category]]: [[value]]",
-                        "fillAlphas": 1,
-                        "lineColor": "#05cf5e",
-                        "id": "shipmentTotal",
-                        "title": "За приёмку",
-                        "type": "column",
-                        "valueField": "shipmentTotal"
-                    }
-                ],
+                "graphs": [],
                 "guides": [],
                 "valueAxes": [
                     {
-                        "id": "cost",
-                        "stackType": "regular",
-                        "title": "Заработано  (рублей)",
-                        "minVerticalGap": 10,
-                        "precision": 0,
-                        "labelFrequency": 10
+                        "gridAlpha": 1,
+                        "title": "Курса (рублей)"
                     }
                 ],
                 "allLabels": [],
@@ -160,57 +128,39 @@
             }
         );
 
-        chartFulfilment.dataProvider = [
-            {
-                "date": "2016-08-22",
-                "packTotal": "0",
-                "productTotal": 70,
-                "shipmentTotal": 0
-            },
-            {
-                "date": "2016-08-23",
-                "packTotal": "0",
-                "productTotal": 60,
-                "shipmentTotal": 126
-            },
-            {
-                "date": "2016-08-24",
-                "packTotal": "0",
-                "productTotal": 570,
-                "shipmentTotal": 1410
-            },
-            {
-                "date": "2016-08-25",
-                "packTotal": "0",
-                "productTotal": 740,
-                "shipmentTotal": 202
-            },
-            {
-                "date": "2016-08-26",
-                "packTotal": "0",
-                "productTotal": 610,
-                "shipmentTotal": 166
-            },
-            {
-                "date": "2016-08-29",
-                "packTotal": "0",
-                "productTotal": 410,
-                "shipmentTotal": 144
-            },
-            {
-                "date": "2016-08-30",
-                "packTotal": "0",
-                "productTotal": 160,
-                "shipmentTotal": 126
-            },
-            {
-                "date": "2016-08-31",
-                "packTotal": "0",
-                "productTotal": 960,
-                "shipmentTotal": 60
-            }
-        ];
-        chartFulfilment.validateData();
+        {% for graph in graphs %}
+        chartFulfilment.graphs.push({
+            "balloonText": "[[title]] [[category]]: [[value]]",
+            "fillAlphas": 1,
+            "title": "{{ graph.name }}",
+            "type": "column",
+            "id": "{{ graph.charCode }}",
+            "valueField": "{{ graph.charCode }}"
+        });
+        {% endfor %}
 
+        {% for key, data in dataProvider %}
+        var data = {};
+
+        {% for currency, value in dataProvider[key] %}
+        data["{{ currency }}"] =  "{{ value }}"
+        {% endfor %}
+
+        data['date'] = "{{ key }}";
+        chartFulfilment.dataProvider.push(data);
+        {% endfor %}
+
+        chartFulfilment.validateData();
+        $('#submit').on('click', function () {
+            $.ajax({
+                url: "{{ url('rates-statistics') }}",
+                data: $('form input').serialize(),
+                method: 'POST',
+                success: function (response) {
+                    chartFulfilment.dataProvider = response.dataProvider;
+                    chartFulfilment.graphs = response.graphs;
+                }
+            });
+        });
     </script>
 {% endblock %}

@@ -7,12 +7,14 @@ import '../../node_modules/amstock3/amcharts/style.css';
 
 import 'bootstrap';
 import 'bootstrap-datepicker';
-import $ from 'jquery';
 import '../../node_modules/amstock3/amcharts/amcharts.js';
 import '../../node_modules/amstock3/amcharts/themes/light.js';
 import '../../node_modules/amstock3/amcharts/serial.js';
 import '../../node_modules/amstock3/amcharts/amstock.js';
 import './landkit';
+import $ from 'jquery';
+window.$ = $;
+
 
 $(function () {
     $.ajax({

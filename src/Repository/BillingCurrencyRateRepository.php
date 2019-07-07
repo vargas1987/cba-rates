@@ -12,6 +12,23 @@ class BillingCurrencyRateRepository extends EntityRepository
 {
     /**
      * @param array $params
+     * @return mixed
+     */
+    public function getGraphData(array $params)
+    {
+        return $this->getRatesQb($params)
+            ->select('bcr.date')
+            ->addSelect('json_agg(bcr.currencyFrom) AS currencies')
+            ->addSelect('json_agg(bcr.value) AS values')
+            ->groupBy('bcr.date')
+            ->orderBy('bcr.date')
+            ->getQuery()->getResult()
+        ;
+
+    }
+
+    /**
+     * @param array $params
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getRatesQb(array $params)
