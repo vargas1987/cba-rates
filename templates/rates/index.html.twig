@@ -146,7 +146,6 @@
         data["{{ currency }}"] =  "{{ value }}"
         {% endfor %}
 
-        data['date'] = "{{ key }}";
         chartFulfilment.dataProvider.push(data);
         {% endfor %}
 
@@ -157,8 +156,20 @@
                 data: $('form input').serialize(),
                 method: 'POST',
                 success: function (response) {
+                    var graphs = []
+                    for (idnex in response.graphs) {
+                        graphs.push({
+                            balloonText: "[[title]] [[category]]: [[value]]",
+                            fillAlphas: 1,
+                            title: response.graphs[idnex].name,
+                            type: "column",
+                            id: response.graphs[idnex].charCode,
+                            valueField: response.graphs[idnex].charCode
+                        });
+                    }
+                    chartFulfilment.graphs = graphs;
                     chartFulfilment.dataProvider = response.dataProvider;
-                    chartFulfilment.graphs = response.graphs;
+                    chartFulfilment.validateData();
                 }
             });
         });

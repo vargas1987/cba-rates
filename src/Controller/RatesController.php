@@ -159,8 +159,11 @@ class RatesController extends AbstractController
 
             $valeus = json_decode($data['values'], true);
             $currencies = array_combine($currencies, $valeus);
+            $currencies = array_merge([
+                'date' => $data['date']->format('Y-m-d')
+            ], $currencies);
 
-            $result[$data['date']->format('Y-m-d')] = $currencies;
+            $result[] = $currencies;
 
             return $result;
         }, []);
