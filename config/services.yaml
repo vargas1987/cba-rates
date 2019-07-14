@@ -31,6 +31,10 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+    Monolog\Logger:
+        public: true
+        arguments:
+          $name: 'logger'
     #Command
     CbrRates\Command\GetCurrenciesRatesCommand:
         tags:

@@ -5,6 +5,7 @@ namespace CbrRates\Controller;
 use CbrRates\Entity\BillingCurrency;
 use CbrRates\Entity\BillingCurrencyRate;
 use CbrRates\Exception\BasicException;
+use CbrRates\Exception\FileDownloadException;
 use CbrRates\Form\ChartForm;
 use CbrRates\Form\CurrencyFilterForm;
 use CbrRates\Repository\BillingCurrencyRateRepository;
@@ -12,9 +13,15 @@ use CbrRates\Repository\BillingCurrencyRepository;
 use CbrRates\Service\PagerService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Monolog\Logger;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use function Symfony\Component\DependencyInjection\Tests\Fixtures\factoryFunction;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,6 +61,12 @@ class RatesController extends AbstractController
 
         $qb = $currencyRateRepo->getRatesQb($params);
 
+        $dataProvider = $this->prepareDataprovider([
+            'rateUpperDate' => $form->get('rateUpperDate')->getData(),
+            'rateLowerDate' => $form->get('rateLowerDate')->getData(),
+            'currencyTo' => BillingCurrency::CODE_RUB,
+        ]);
+
         try {
             /** @var Pagerfanta|BillingCurrencyRate[] $pager */
             $pager = $this->get(PagerService::class)->getPagerByQueryBuilder($qb, [
@@ -61,15 +74,13 @@ class RatesController extends AbstractController
                 PagerService::OPT_PER_PAGE => 30,
                 PagerService::OPT_PER_PAGE_LIMIT => 30,
             ]);
+
+            if ($request->request->get('download')) {
+                return $this->downloadJson($dataProvider);
+            }
         } catch (BasicException $exception) {
             return $this->redirectToRoute('backend-dashboard');
         }
-
-        $dataProvider = $this->prepareDataprovider([
-            'rateUpperDate' => $form->get('rateUpperDate')->getData(),
-            'rateLowerDate' => $form->get('rateLowerDate')->getData(),
-            'currencyTo' => BillingCurrency::CODE_RUB,
-        ]);
 
         $graphs = $this->prepareGraphs($dataProvider);
 
@@ -88,7 +99,7 @@ class RatesController extends AbstractController
      *
      * @return Response
      */
-    public function statisticsAction(Request $request)
+    public function statistics(Request $request)
     {
         if ($request->isXmlHttpRequest()) {
             $form = $this->createForm(CurrencyFilterForm::class);
@@ -108,6 +119,27 @@ class RatesController extends AbstractController
         }
 
         return new JsonResponse([]);
+    }
+
+    /**
+     * @param array $dataProvider
+     * @return BinaryFileResponse
+     * @throws BasicException
+     */
+    public function downloadJson(array $dataProvider)
+    {
+        try {
+            $fileName = uniqid('json_').'.json';
+            $filePath = $this->get('kernel')->getProjectDir().'/var/downloads/'.$fileName;
+            $fs = new Filesystem();
+            $fs->dumpFile($filePath, (string) json_encode($dataProvider));
+
+            return $this->file($filePath);
+        } catch (\Exception $e) {
+            $this->get(Logger::class)->error($e->getMessage(), ['exception' => $e]);
+
+            throw new BasicException('Упс! Вы сломали Валюту');
+        }
     }
 
     /**

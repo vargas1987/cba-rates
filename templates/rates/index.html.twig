@@ -30,10 +30,13 @@
                         <div class="col-md-3">
                             <span class="sort">Курс</span>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <span class="sort">Дата курса <i class="fa fa-sort"></i>
                                 {{ form_row(form.rateDateSort) }}
                             </span>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" name="download" value="download" class="btn btn-sm" title="Загрузить из файла"><i class="fa fa-upload"></i></button>
                         </div>
                     </div>
                 </li>
@@ -41,15 +44,16 @@
                     <li class="list-group-item">
                         <div class="row">
                             <div class="visible-md visible-lg col-md-1">{{ loop.index }}</div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 {{ item.currencyFrom.name }}
                             </div>
                             <div class="col-md-3">
                                 {{ item.value }} ₽
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 {{ item.date|date("F jS \\a\\t g:ia") }}
                             </div>
+                            <div class="col-md-2"></div>
                         </div>
                     </li>
                 {% else %}
